@@ -17,12 +17,14 @@ import com.pathplanner.lib.auto.NamedCommands;
 
 import frc.robot.Subsystems.SwerveSubsystem;
 import frc.robot.Subsystems.armSubystem;
+import frc.robot.Subsystems.shooterSubsystem;
 
 public class RobotContainer {
 
   private final SwerveSubsystem drivebase = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
       "JsonConstants"));
   private final  armSubystem armsubsystem = new armSubystem();
+  private final shooterSubsystem shooter = new shooterSubsystem();
   final CommandXboxController driverXbox = new CommandXboxController(0);
 
   public RobotContainer() {
@@ -40,12 +42,13 @@ public class RobotContainer {
   }
 
   private void configureBindings() {
-    driverXbox.a().whileTrue(new Aim(drivebase, armsubsystem));
+    //driverXbox.a().whileTrue(new Aim(drivebase, armsubsystem));
+    driverXbox.b().whileTrue(new shooterCmd(shooter, Constants.Shooter.shootSpeed));
 
   }
 
   public Command getAutonomousCommand() {
-    return drivebase.getAutonomousCommand("New Auto");
+    return drivebase.getAutonomousCommand("Hello");
   }
 
   public void setMotorBrake(boolean brake) {

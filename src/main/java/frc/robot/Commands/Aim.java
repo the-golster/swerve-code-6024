@@ -45,27 +45,30 @@ public class Aim extends Command {
         double TY = LimelightHelpers.getTY("");
         final Translation2d noTrans = new Translation2d(0, 0);
 
-        double angleS, h1, h2, d1, d2, h, d;
+        double angleS, h1, h2, d1, d2, d3, h, d, r;
 
         if (ID == 7 || ID == 4 || ID == 5 || ID == 4) {
             if (ID == 7 || ID == 4) {
-                swerve.drive(noTrans, TX, false);
 
                 h1 = 1;
                 h2 = 1;
                 d2 = 1;
             } else {
-                swerve.drive(noTrans, TX, false);
 
                 h1 = 1;
                 h2 = 1;
                 d2 = 1;
             }
 
-            h = h2 + h2;
+            h = h1 + h2;
             d1 = h1 / Math.tan(TY * Math.PI / 180);
             d = d1 + d2;
             angleS = Math.atan(h / d);
+
+            d3 = d2 / 2;
+            r = Math.atan((d1 * Math.tan(TX * Math.PI / 180)) / (d1 + d3));
+
+            swerve.drive(noTrans, r, false);
 
             double absoluteEncoder = 2 * Arm.getAbsoluteEncoder() * Math.PI;
 
@@ -91,7 +94,7 @@ public class Aim extends Command {
     // Returns true when the command should end.
     @Override
     public boolean isFinished() {
-        if(Constants.smartEnable){
+        if (Constants.smartEnable) {
             SmartDashboard.putString("Status", "finished");
         }
         return false;

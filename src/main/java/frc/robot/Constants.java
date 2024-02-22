@@ -37,13 +37,22 @@ public class Constants {
 
   public static class Arm
   {
-    public static final int armLeftID = 1;
-    public static final int armRightID = 2;
+    public static final int armLeftID = 20;
+    public static final int armRightID = 21;
     public static final double armSpeed = 0.2;
     public static final boolean leftInvert = false; 
     public static final boolean rightInvert = true; 
     public static final double absoluteOffset = 0;
     public static final double kp = 0.1;
     public static final double kd = 0.2;
+  }
+
+  public static class Shooter
+  {
+    public static final int shooterLeftID = 25;
+    public static int shooterRightID = 26;
+    public static boolean leftInvert = false; 
+    public static boolean rightInvert = false; 
+    public static double shootSpeed = 1;
   }
 }
