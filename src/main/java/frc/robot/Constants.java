@@ -54,5 +54,9 @@ public class Constants {
     public static boolean leftInvert = false; 
     public static boolean rightInvert = false; 
     public static double shootSpeed = 1;
+    public static double kp = 0.001;
+    public static double kd = 0.001;
+
+    //1, 1tic/s, 0.001
   }
 }

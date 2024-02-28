@@ -7,6 +7,7 @@ package frc.robot;
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.Filesystem;
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
 import frc.robot.Constants.OperatorConstants;
 import java.io.File;
@@ -34,21 +35,22 @@ public class RobotContainer {
     configureBindings();
 
     Command driveSwerve = drivebase.driveCommand(
-        () -> -MathUtil.applyDeadband(driverXbox.getLeftY(), OperatorConstants.LEFT_Y_DEADBAND),
-        () -> -MathUtil.applyDeadband(driverXbox.getLeftX(), OperatorConstants.LEFT_X_DEADBAND),
-        () -> -driverXbox.getRightX());
+        () -> MathUtil.applyDeadband(driverXbox.getLeftY(), OperatorConstants.LEFT_Y_DEADBAND),
+        () -> MathUtil.applyDeadband(driverXbox.getLeftX(), OperatorConstants.LEFT_X_DEADBAND),
+        () -> driverXbox.getRightX());
 
     drivebase.setDefaultCommand(driveSwerve);
   }
 
   private void configureBindings() {
     //driverXbox.a().whileTrue(new Aim(drivebase, armsubsystem));
-    driverXbox.b().whileTrue(new shooterCmd(shooter, Constants.Shooter.shootSpeed));
+    // driverXbox.b().whileTrue(new shooterCmd(shooter, Constants.Shooter.shootSpeed));
+    driverXbox.b().whileTrue(Commands.runOnce(drivebase::zeroGyro));
 
   }
 
   public Command getAutonomousCommand() {
-    return drivebase.getAutonomousCommand("Hello");
+    return drivebase.getAutonomousCommand("Newauto");
   }
 
   public void setMotorBrake(boolean brake) {
