@@ -6,9 +6,11 @@ package frc.robot;
 
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.wpilibj.Filesystem;
+import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
+import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.Constants.OperatorConstants;
 import java.io.File;
 import frc.robot.Commands.*;
@@ -27,6 +29,7 @@ public class RobotContainer {
   private final  armSubystem armsubsystem = new armSubystem();
   private final shooterSubsystem shooter = new shooterSubsystem();
   final CommandXboxController driverXbox = new CommandXboxController(0);
+  final Joystick joystick = new Joystick(1);
 
   public RobotContainer() {
     
@@ -37,7 +40,7 @@ public class RobotContainer {
     Command driveSwerve = drivebase.driveCommand(
         () -> -MathUtil.applyDeadband(driverXbox.getLeftY(), OperatorConstants.LEFT_Y_DEADBAND),
         () -> -MathUtil.applyDeadband(driverXbox.getLeftX(), OperatorConstants.LEFT_X_DEADBAND),
-        () -> -driverXbox.getRightX());
+        () -> -driverXbox.getRightX(), false, true);
 
     drivebase.setDefaultCommand(driveSwerve);
   }
@@ -46,6 +49,7 @@ public class RobotContainer {
     //driverXbox.a().whileTrue(new Aim(drivebase, armsubsystem));
     // driverXbox.b().whileTrue(new shooterCmd(shooter, Constants.Shooter.shootSpeed));
     driverXbox.b().whileTrue(Commands.runOnce(drivebase::zeroGyro));
+    driverXbox.x().onTrue(new Align(drivebase));
 
   }
 

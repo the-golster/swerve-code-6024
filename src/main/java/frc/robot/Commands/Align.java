@@ -5,11 +5,15 @@
 package frc.robot.Commands;
 
 import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 
 import frc.robot.Subsystems.SwerveSubsystem;
 import frc.robot.LimelightHelpers;
+
+import java.util.List;
+import java.util.function.DoubleSupplier;
 
 import org.photonvision.PhotonCamera;
 import org.photonvision.targeting.PhotonTrackedTarget;
@@ -23,19 +27,22 @@ import frc.robot.Constants;
 public class Align extends Command {
 
     private final SwerveSubsystem swerve;
-    private final PIDController PID;
-    final PhotonCamera photonCamera = new PhotonCamera("photonvision");
+    private final PIDController PIDang;
+    private final PIDController PIDmove;
+    final PhotonCamera photonCamera = new PhotonCamera("cam");
 
     public Align(SwerveSubsystem swerve) {
         this.swerve = swerve;
-        this.PID = new PIDController(Constants.Arm.kp, 0, Constants.Arm.kd);
+        this.PIDang = new PIDController(1, 0, 2);
+        this.PIDmove = new PIDController(1, 0, 2);
 
         addRequirements(swerve);
     }
 
     @Override
     public void initialize() {
-        PID.reset();
+        PIDang.reset();
+        PIDmove.reset();
     }
 
     // Called every time the scheduler runs while the command is scheduled.
@@ -43,55 +50,48 @@ public class Align extends Command {
     public void execute() {
 
         // double ID = LimelightHelpers.getFiducialID("");
-        double TX = LimelightHelpers.getTX("");
-        double TY = LimelightHelpers.getTY("");
-        var latestResult = photonCamera.getLatestResult();
-        boolean hasTargets = latestResult.hasTargets();
-        PhotonTrackedTarget target = latestResult.getBestTarget();
-
-        double yaw = target.getYaw();
-        double pitch = target.getPitch();
-        double area = target.getArea();
-        double skew = target.getSkew();
-        double ID = target.getFiducialId();
-        final Translation2d noTrans = new Translation2d(0, 0);
-
-        double angleS, h1, h2, d1, d2, d3, h, d, r;
-
+        var result = photonCamera.getLatestResult();
+        boolean hasTargets = result.hasTargets();
         if (hasTargets) {
-            if (ID == 7 || ID == 4) {
+            List<PhotonTrackedTarget> targets = result.getTargets();
+            PhotonTrackedTarget target = result.getBestTarget();
 
-                h1 = 1;
-                h2 = 1;
-                d2 = 1;
-            } else {
+            double TX = target.getYaw();
+            double TY = target.getPitch();
 
-                h1 = 1;
-                h2 = 1;
-                d2 = 1;
-            }
+            double ID = target.getFiducialId();
 
-            h = h1 + h2;
-            d1 = h1 / Math.tan(TY * Math.PI / 180);
+            double d1, d2, d, r, a;
+
+            d1 = 0.307975;
+            d2 = 0.1 / (Math.tan(Math.toRadians(TY)));
             d = d1 + d2;
-            angleS = Math.atan(h / d);
 
-            d3 = d2 / 2;
-            r = Math.atan((d1 * Math.tan(TX * Math.PI / 180)) / (d1 + d3));
+            a = d2 * Math.tan(Units.degreesToRadians(TX));
 
-            swerve.drive(noTrans, r, false);
+            r = Math.tanh(a / d);
 
-            // double absoluteEncoder = 2 * Arm.getAbsoluteEncoder() * Math.PI;
+            PIDang.setSetpoint(0);
+            PIDmove.setSetpoint(1);
 
-            // double speed = PID.calculate(absoluteEncoder, angleS);
+            Double x = 0.0;
+            Double rot = PIDang.calculate((r / 2 * Math.PI));
+            Double y = PIDmove.calculate(d2);
 
-            // Arm.setMotors(speed, speed);
+            swerve.driveCommand(
+                    () -> x,
+                    () -> y,
+                    () -> rot, true, false);
 
             if (Constants.smartEnable) {
-                SmartDashboard.putNumber("AngleS", angleS);
-                // SmartDashboard.putNumber("Speed", speed);
-                SmartDashboard.putNumber("d1", d1);
-                SmartDashboard.putString("Status", "aiming");
+                SmartDashboard.putNumber("TX", TX);
+                SmartDashboard.putNumber("TX", TX);
+
+                SmartDashboard.putNumber("d2", d2);
+                SmartDashboard.putNumber("a", a);
+
+                SmartDashboard.putNumber("rot", rot);
+                SmartDashboard.putNumber("y", y);
             }
 
         }
