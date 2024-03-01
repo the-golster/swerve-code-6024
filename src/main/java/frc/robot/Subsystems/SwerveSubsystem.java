@@ -62,7 +62,7 @@ public class SwerveSubsystem extends SubsystemBase {
      * Construct the swerve drive.
      *
      * @param driveCfg      SwerveDriveConfiguration for the swerve.
-     * @param controllerCfg Swerve Controller.
+     * @param controllerCfg S\erve Controller.
      */
     public SwerveSubsystem(SwerveDriveConfiguration driveCfg, SwerveControllerConfiguration controllerCfg) {
         swerveDrive = new SwerveDrive(driveCfg, controllerCfg, maximumSpeed);
@@ -132,7 +132,7 @@ public class SwerveSubsystem extends SubsystemBase {
                         // Translation PID constants
                         AutonConstants.ANGLE_PID,
                         // Rotation PID constants
-                        1.0,
+                        4.5,
                         // Max module speed, in m/s
                         swerveDrive.swerveDriveConfiguration.getDriveBaseRadiusMeters(),
                         // Drive base radius in meters. Distance from robot center to furthest module.
@@ -172,8 +172,9 @@ public class SwerveSubsystem extends SubsystemBase {
     public Command driveToPose(Pose2d pose) {
         // Create the constraints to use while pathfinding
         PathConstraints constraints = new PathConstraints(
-                swerveDrive.getMaximumVelocity(), 4.0,
+                swerveDrive.getMaximumVelocity(), 4.5,
                 swerveDrive.getMaximumAngularVelocity(), Units.degreesToRadians(720));
+        // PathConstraints constraints = new PathConstraints(4.5, 3.5, Units.degreesToRadians(720), Units.degreesToRadians(540));
 
         // Since AutoBuilder is configured, we can use it to build pathfinding commands
         return AutoBuilder.pathfindToPose(
