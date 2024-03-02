@@ -14,6 +14,7 @@ import edu.wpi.first.math.kinematics.SwerveDriveKinematics;
 import edu.wpi.first.math.trajectory.Trajectory;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.DriverStation;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.SubsystemBase;
 import frc.robot.Constants.AutonConstants;
@@ -32,7 +33,7 @@ public class SwerveSubsystem extends SubsystemBase {
 
     private final SwerveDrive swerveDrive;
 
-    public double maximumSpeed = 0.5;
+    public double maximumSpeed = 2  ;
 
     /**
      * Initialize {@link SwerveDrive} with the directory provided.
@@ -88,6 +89,9 @@ public class SwerveSubsystem extends SubsystemBase {
                         Math.pow(angularRotationX.getAsDouble(), 3) * swerveDrive.getMaximumAngularVelocity(),
                         FieldRelativity,
                         false);
+    
+    SmartDashboard.putNumber("maxVel", swerveDrive.getMaximumVelocity());
+    SmartDashboard.putNumber("maxAngVel", swerveDrive.getMaximumAngularVelocity());
     }); 
   }
 

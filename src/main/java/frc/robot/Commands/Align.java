@@ -85,13 +85,14 @@ public class Align extends Command {
 
             if (Constants.smartEnable) {
                 SmartDashboard.putNumber("TX", TX);
-                SmartDashboard.putNumber("TX", TX);
+                SmartDashboard.putNumber("TY", TY);
 
                 SmartDashboard.putNumber("d2", d2);
                 SmartDashboard.putNumber("a", a);
 
-                SmartDashboard.putNumber("rot", rot);
+                SmartDashboard.putNumber("x", x);
                 SmartDashboard.putNumber("y", y);
+                SmartDashboard.putNumber("rot", rot);
             }
 
         }

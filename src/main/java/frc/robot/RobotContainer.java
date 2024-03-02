@@ -26,14 +26,14 @@ public class RobotContainer {
 
   private final SwerveSubsystem drivebase = new SwerveSubsystem(new File(Filesystem.getDeployDirectory(),
       "JsonConstants"));
-  private final  armSubystem armsubsystem = new armSubystem();
-  private final shooterSubsystem shooter = new shooterSubsystem();
+  // private final  armSubystem armsubsystem = new armSubystem();
+  // private final shooterSubsystem shooter = new shooterSubsystem();
   final CommandXboxController driverXbox = new CommandXboxController(0);
-  final Joystick joystick = new Joystick(1);
+  // final Joystick joystick = new Joystick(1);
 
   public RobotContainer() {
     
-    NamedCommands.registerCommand("armCmd", new armCmd(armsubsystem, 1, 1));
+    // NamedCommands.registerCommand("armCmd", new armCmd(armsubsystem, 1, 1));
     
     configureBindings();
 
