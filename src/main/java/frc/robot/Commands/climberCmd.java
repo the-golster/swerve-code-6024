@@ -24,7 +24,7 @@ public class climberCmd extends Command {
   public void initialize() {}
 
 
-  @Overridej
+  @Override
   public void execute() {
     climber.setMotor(speed);
   }
