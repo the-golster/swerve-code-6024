@@ -48,59 +48,70 @@ public class Align extends Command {
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-        
         // double ID = LimelightHelpers.getFiducialID("");
         var result = photonCamera.getLatestResult();
         boolean hasTargets = result.hasTargets();
         if (hasTargets) {
             List<PhotonTrackedTarget> targets = result.getTargets();
             PhotonTrackedTarget target = result.getBestTarget();
-            
-            double TX = target.getYaw();
-            double TY = target.getPitch();
+            for (PhotonTrackedTarget cur_target : targets) {
+                if (cur_target.getFiducialId() == 5 || cur_target.getFiducialId() == 7) {
+                    target = cur_target;
+                    break;
+                }
+            }
 
-            double ID = target.getFiducialId();
+            SmartDashboard.putNumber("Tar id", target.getFiducialId());
 
-            double d1, d2, d, r, a;
+            if (target.getFiducialId() == 5 || target.getFiducialId() == 7) {
+                
+                double TX = target.getYaw();
+                double TY = target.getPitch();
 
-            d1 = 0.307975;
-            // d2 = 0.1 / (Math.tan(Math.toRadians(TY)));
-            d2 = PhotonUtils.calculateDistanceToTargetMeters(
-                                0,
-                                0.1,
-                                0,
-                                Units.degreesToRadians(result.getBestTarget().getPitch()));
+                double ID = target.getFiducialId();
 
-            d = d1 + d2;
+                double d1, d2, d, r, a;
+                d1 = 0.307975;
+                // d2 = 0.1 / (Math.tan(Math.toRadians(TY)));
+                d2 = PhotonUtils.calculateDistanceToTargetMeters(
+                                    0,
+                                    0.1,
+                                    0,
+                                    Units.degreesToRadians(result.getBestTarget().getPitch()));
 
-            a = d2 * Math.tan(Units.degreesToRadians(TX));
+                d = d1 + d2;
 
-            r = Math.tanh(a / d);
+                a = d2 * Math.tan(Units.degreesToRadians(TX));
 
-            PIDang.setSetpoint(0);
-            PIDmove.setSetpoint(1);
+                r = Math.tanh(a / d);
 
-            double x = PIDmove.calculate(d2);
-            Double rot = PIDang.calculate(((r / 2 * Math.PI)));
-            Double y = 0.0;
- 
-            // Command AlignSwerve = swerve.driveCommand(
-            //         () -> 1,
-            //         () -> 1,
-            //         () -> 1, true, false);
-            
-            swerve.drive(new Translation2d(0,y), rot, false);
+                PIDang.setSetpoint(0);
+                PIDmove.setSetpoint(1);
 
-            if (Constants.smartEnable) {
-                SmartDashboard.putNumber("TX", TX);
-                SmartDashboard.putNumber("TY", TY);
+                double x = PIDmove.calculate(d2);
+                Double rot = PIDang.calculate(((r / 2 * Math.PI)));
+                Double y = 0.0;
+    
+                // Command AlignSwerve = swerve.driveCommand(
+                //         () -> 1,
+                //         () -> 1,
+                //         () -> 1, true, false);
+                
+                swerve.drive(new Translation2d(0,y), rot, false);
+                
+                if (Constants.smartEnable) {
+                    SmartDashboard.putNumber("TX", TX);
+                    SmartDashboard.putNumber("TY", TY);
 
-                SmartDashboard.putNumber("d2", d2);
-                SmartDashboard.putNumber("a", a);
+                    SmartDashboard.putNumber("d2", d2);
+                    SmartDashboard.putNumber("a", a);
 
-                SmartDashboard.putNumber("x", x);
-                SmartDashboard.putNumber("y", y);
-                SmartDashboard.putNumber("rot", rot);
+                    SmartDashboard.putNumber("x", x);
+                    SmartDashboard.putNumber("y", y);
+                    SmartDashboard.putNumber("rot", rot);
+                }
+            } else {
+                swerve.drive(new Translation2d(0, 0), 0, true);
             }
 
         }
@@ -109,11 +120,13 @@ public class Align extends Command {
     // Called once the command ends or is interrupted.
     @Override
     public void end(boolean interrupted) {
+        swerve.drive(new Translation2d(0, 0), 0, true);
     }
 
     // Returns true when the command should end.
     @Override
     public boolean isFinished() {
+        swerve.drive(new Translation2d(0, 0), 0, true);
         if (Constants.smartEnable) {
             SmartDashboard.putString("Status", "finished");
         }
