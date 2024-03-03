@@ -28,7 +28,7 @@ public class armCmd extends Command {
 
 @Override
 public void execute() {
-    //Arm.setMotors(leftSpeed, rightSpeed);
+    // Arm.setMotors(leftSpeed, rightSpeed);
     SmartDashboard.putNumber("rightspeed", rightSpeed);
     SmartDashboard.putNumber("leftspeed", leftSpeed);
   }
