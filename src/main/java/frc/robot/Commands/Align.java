@@ -32,8 +32,8 @@ public class Align extends Command {
 
     public Align(SwerveSubsystem swerve) {
         this.swerve = swerve;
-        this.PIDang = new PIDController(1, 0, 2);
-        this.PIDmove = new PIDController(1, 0, 2);
+        this.PIDang = new PIDController(0.5, 0, 0);
+        this.PIDmove = new PIDController(0.5, 0, 0);
 
         addRequirements(swerve);
     }
@@ -60,22 +60,18 @@ public class Align extends Command {
                     break;
                 }
             }
+        
 
-            SmartDashboard.putNumber("Tar id", target.getFiducialId());
-
-            if (target.getFiducialId() == 5 || target.getFiducialId() == 7) {
-                
+            if (target.getFiducialId() == 5 || target.getFiducialId() == 7) {                
                 double TX = target.getYaw();
                 double TY = target.getPitch();
 
-                double ID = target.getFiducialId();
-
                 double d1, d2, d, r, a;
-                d1 = 0.307975;
+                d1 = 0.420;
                 // d2 = 0.1 / (Math.tan(Math.toRadians(TY)));
                 d2 = PhotonUtils.calculateDistanceToTargetMeters(
-                                    0,
-                                    0.1,
+                                    0.195,
+                                    0.580,
                                     0,
                                     Units.degreesToRadians(result.getBestTarget().getPitch()));
 
@@ -89,7 +85,7 @@ public class Align extends Command {
                 PIDmove.setSetpoint(1);
 
                 double x = PIDmove.calculate(d2);
-                Double rot = PIDang.calculate(((r / 2 * Math.PI)));
+                Double rot = PIDang.calculate(((r / Math.PI)));
                 Double y = 0.0;
     
                 // Command AlignSwerve = swerve.driveCommand(
@@ -97,7 +93,7 @@ public class Align extends Command {
                 //         () -> 1,
                 //         () -> 1, true, false);
                 
-                swerve.drive(new Translation2d(0,y), rot, false);
+                swerve.drive(new Translation2d(x,y), rot, false);
                 
                 if (Constants.smartEnable) {
                     SmartDashboard.putNumber("TX", TX);
@@ -119,14 +115,11 @@ public class Align extends Command {
 
     // Called once the command ends or is interrupted.
     @Override
-    public void end(boolean interrupted) {
-        swerve.drive(new Translation2d(0, 0), 0, true);
-    }
+    public void end(boolean interrupted) {}
 
     // Returns true when the command should end.
     @Override
     public boolean isFinished() {
-        swerve.drive(new Translation2d(0, 0), 0, true);
         if (Constants.smartEnable) {
             SmartDashboard.putString("Status", "finished");
         }
