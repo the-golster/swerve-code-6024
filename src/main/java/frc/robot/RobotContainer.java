@@ -27,6 +27,7 @@ public class RobotContainer {
   // private final  armSubystem armsubsystem = new armSubystem();
   // private final shooterSubsystem shooter = new shooterSubsystem();
   private final intakeSubsystem intake = new intakeSubsystem();
+  private final climberSubsystem climber = new climberSubsystem();
   final CommandXboxController driverXbox = new CommandXboxController(0);
   // final Joystick joystick = new Joystick(1);
 
@@ -50,6 +51,10 @@ public class RobotContainer {
     driverXbox.b().whileTrue(Commands.runOnce(drivebase::zeroGyro));
     driverXbox.x().whileTrue(new Align(drivebase));
     driverXbox.y().whileTrue(new intakeCmd(intake, 0.3));
+
+    driverXbox.leftBumper().whileTrue(new climberCmd(climber, Constants.Climber.climberSpeed));
+    driverXbox.rightBumper().whileTrue(new climberCmd(climber, -Constants.Climber.climberSpeed));
+
   }
 
   public Command getAutonomousCommand() {

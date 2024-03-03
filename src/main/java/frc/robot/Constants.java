@@ -69,4 +69,10 @@ public class Constants {
 
     //1, 1tic/s, 0.001
   }
+
+  public static class Climber {
+    public static final int climberID = 40;
+    public static final boolean climberInvert = false;
+    public static final double climberSpeed = 0.5;
+  }
 }
