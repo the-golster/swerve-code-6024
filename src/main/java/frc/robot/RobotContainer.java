@@ -18,9 +18,7 @@ import frc.robot.Commands.*;
 
 import com.pathplanner.lib.auto.NamedCommands;
 
-import frc.robot.Subsystems.SwerveSubsystem;
-import frc.robot.Subsystems.armSubystem;
-import frc.robot.Subsystems.shooterSubsystem;
+import frc.robot.Subsystems.*;
 
 public class RobotContainer {
 
@@ -28,6 +26,7 @@ public class RobotContainer {
       "JsonConstants"));
   // private final  armSubystem armsubsystem = new armSubystem();
   // private final shooterSubsystem shooter = new shooterSubsystem();
+  private final intakeSubsystem intake = new intakeSubsystem();
   final CommandXboxController driverXbox = new CommandXboxController(0);
   // final Joystick joystick = new Joystick(1);
 
@@ -40,7 +39,7 @@ public class RobotContainer {
     Command driveSwerve = drivebase.driveCommand(
         () -> -MathUtil.applyDeadband(driverXbox.getLeftY(), OperatorConstants.LEFT_Y_DEADBAND),
         () -> -MathUtil.applyDeadband(driverXbox.getLeftX(), OperatorConstants.LEFT_X_DEADBAND),
-        () -> -driverXbox.getRightX(), false, true);
+        () -> -MathUtil.applyDeadband(driverXbox.getRightX(), OperatorConstants.RIGHT_X_DEADBAND), false, true);
 
     drivebase.setDefaultCommand(driveSwerve);
   }
@@ -49,8 +48,8 @@ public class RobotContainer {
     //driverXbox.a().whileTrue(new Aim(drivebase, armsubsystem));
     // driverXbox.b().whileTrue(new shooterCmd(shooter, Constants.Shooter.shootSpeed));
     driverXbox.b().whileTrue(Commands.runOnce(drivebase::zeroGyro));
-    driverXbox.x().onTrue(new Align(drivebase));
-
+    driverXbox.x().whileTrue(new Align(drivebase));
+    driverXbox.y().whileTrue(new intakeCmd(intake, 0.3));
   }
 
   public Command getAutonomousCommand() {

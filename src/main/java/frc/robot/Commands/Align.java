@@ -4,21 +4,20 @@
 
 package frc.robot.Commands;
 
-import edu.wpi.first.math.geometry.Translation2d;
 import edu.wpi.first.math.util.Units;
 import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
 import edu.wpi.first.wpilibj2.command.Command;
 
 import frc.robot.Subsystems.SwerveSubsystem;
-import frc.robot.LimelightHelpers;
 
 import java.util.List;
-import java.util.function.DoubleSupplier;
 
 import org.photonvision.PhotonCamera;
+import org.photonvision.PhotonUtils;
 import org.photonvision.targeting.PhotonTrackedTarget;
 
 import edu.wpi.first.math.controller.PIDController;
+import edu.wpi.first.math.geometry.Translation2d;
 import frc.robot.Constants;
 
 /**
@@ -43,19 +42,20 @@ public class Align extends Command {
     public void initialize() {
         PIDang.reset();
         PIDmove.reset();
+        photonCamera.setPipelineIndex(0);
     }
 
     // Called every time the scheduler runs while the command is scheduled.
     @Override
     public void execute() {
-
+        
         // double ID = LimelightHelpers.getFiducialID("");
         var result = photonCamera.getLatestResult();
         boolean hasTargets = result.hasTargets();
         if (hasTargets) {
             List<PhotonTrackedTarget> targets = result.getTargets();
             PhotonTrackedTarget target = result.getBestTarget();
-
+            
             double TX = target.getYaw();
             double TY = target.getPitch();
 
@@ -64,7 +64,13 @@ public class Align extends Command {
             double d1, d2, d, r, a;
 
             d1 = 0.307975;
-            d2 = 0.1 / (Math.tan(Math.toRadians(TY)));
+            // d2 = 0.1 / (Math.tan(Math.toRadians(TY)));
+            d2 = PhotonUtils.calculateDistanceToTargetMeters(
+                                0,
+                                0.1,
+                                0,
+                                Units.degreesToRadians(result.getBestTarget().getPitch()));
+
             d = d1 + d2;
 
             a = d2 * Math.tan(Units.degreesToRadians(TX));
@@ -74,14 +80,16 @@ public class Align extends Command {
             PIDang.setSetpoint(0);
             PIDmove.setSetpoint(1);
 
-            Double x = 0.0;
-            Double rot = PIDang.calculate((r / 2 * Math.PI));
-            Double y = PIDmove.calculate(d2);
-
-            swerve.driveCommand(
-                    () -> x,
-                    () -> y,
-                    () -> rot, true, false);
+            double x = PIDmove.calculate(d2);
+            Double rot = PIDang.calculate(((r / 2 * Math.PI)));
+            Double y = 0.0;
+ 
+            // Command AlignSwerve = swerve.driveCommand(
+            //         () -> 1,
+            //         () -> 1,
+            //         () -> 1, true, false);
+            
+            swerve.drive(new Translation2d(0,y), rot, false);
 
             if (Constants.smartEnable) {
                 SmartDashboard.putNumber("TX", TX);
